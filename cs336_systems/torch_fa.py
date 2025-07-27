@@ -4,7 +4,7 @@ import torch
 from einops import einsum
 
 
-def torch_fa_kernel(q, k, v, is_causal=False):
+def torch_fa_fwd_kernel(q, k, v, is_causal=False):
     Bq, Bk = 16, 16
     Tq, Tk = q.shape[-2] // Bq, k.shape[-2] // Bk
     d = q.shape[-1]
@@ -40,7 +40,7 @@ class TorchFlashAttention(torch.autograd.Function):
     @staticmethod
     def forward(ctx, q, k, v, is_causal=False):
         ctx.is_causal = is_causal
-        o, l = torch_fa_kernel(q, k, v, is_causal)
+        o, l = torch_fa_fwd_kernel(q, k, v, is_causal)
         ctx.save_for_backward(q, k, v, o, l)
         return o
 
